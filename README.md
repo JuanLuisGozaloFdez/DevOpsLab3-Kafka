@@ -1,4 +1,4 @@
-# DevOpsLab3: Kafka with ELK
+# DevOpsLab3: Kafka with ELK (WORK IN PROGRESS. NOT COMPLETED)
 
 ## Set Kafka (Stream monitoring system) in one single-node installation with ELK
 
