@@ -17,6 +17,7 @@ services:
     volumes:
       - /tmp/zookeeper/data:/data
       - /tmp/zookeeper/datalog:/datalog
+      
   ##################################################################################
   # KAFKA MAIN BROKER PROCESSOR                                                    #
   ##################################################################################
