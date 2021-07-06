@@ -1,4 +1,4 @@
-# DevOpsLab3-Kafka
+# DevOpsLab3-Kafka (WORK IN PROGRESS. NOT READY YET)
 
 ## Set Kafka (Stream monitoring system) in one single-node installation (with or without ELK)
 
@@ -122,7 +122,7 @@ Remember that Kafka is a stream processing system (a broker) between Producers a
 
 The best way to test the system is open TWO terminals in your docker KAFKA container: one will play the role of Producer and the other for Consumer.
 
-To open the terminals, you need to enter inside the container (using *'docker ps'* you can see the container-id and then execute a *'docker -i -t <container-id> /bin/bash'* command for opening each terminals)
+To open the terminals, you need to enter inside the container (using *'docker ps'* you can see the container-id and then execute a *'docker -i -t your-container-id /bin/bash'* command for opening each terminals)
 
 ### The Producer
 
@@ -161,6 +161,7 @@ Enjoy it!
 To verify Kafka in between Filebeat and Logstash in the ELK stack, you must set the following steps:
 
 ### Pre-step: Set up Filebeat to get info from system (System => Filebeat)
+
 ```bash
 $ docker exec –it filebeat /bin/bash
 $>./filebeat –E "filebeat.config.modules.path=./modules.d/*.yml" modules enable system
@@ -214,3 +215,4 @@ an index with name devopslab-YYYY.MM.DD must be shown in the list of indexes
 $ curl -X GET "localhost:9200/<name-of-the-devopslab-index>/_search" (please substitute index name as appropiate)
 the documents
 $
+```
