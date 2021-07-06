@@ -130,45 +130,55 @@ Now, in the Producer Terminal, a **TOPIC** (let's named *test_topic*) must be cr
 
 ```bash
 $> kafka-topics --create --zookeeper zookeeper:2181 --partitions 1 --replication-factor 1 --topic testtopic
+Created topic testtopic
+$>
 ```
 
 Then, start the process that will publish datastream to the Kafka Broker from the standard input (keybaord) we are going to use for testing
 
 ```bash
 $> kafka-console-producer --broker-list localhost:9092 --topic testtopic
+>
 ```
 
 Also, the process can be injected with data comming from an external process, let's simulate with a loop
 
 ```bash
 $> for x in {1..100}; do echo $x; done | /bin/kafka-console-producer --broker-list localhost:9092 --topic testtopic 
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+$>
 ```
 
 ### The Consumer
 
-Now, in the Consumer Terminal, the Consumer process must be created linked to the Kafka Broker (let's set a timeout also for testing)
+Now, in the Consumer Terminal, the Consumer process must be created linked to the Kafka Broker (let's set a timeout also for testing.
 
 ```bash
 $> /bin/kafka-console-consumer --bootstrap-server localhost:9092 --from-beginning --topic testtopic --timeout-ms 10000
+>
 ```
 
-Now, if everything is setup properly, all text that is typed in the Producer Terminal will appear in the Consumer Terminal and, if you have used the loop, all numbers will appear in the screen.
+Now, if everything is setup properly, all text that is typed in the Producer Terminal will appear in the Consumer Terminal and, if you have used the loop, all numbers will appear in the screen. 
+If nothing is received, then the process will be finished with a message saying "Error processing message, terminating consumer process"
 
 Enjoy it!
 
 ## Second part of the Lab: Test Kafka with ELK stack
 
-To verify Kafka in between Filebeat and Logstash in the ELK stack, you must set the following steps:
+To verify Kafka in between Filebeat and Logstash in the ELK stack, you must make a few changes in the configuration files as it is shown in the following steps:
 
 ### Pre-step: Set up Filebeat to get info from system (System => Filebeat)
+
+First thing is to make Filebeat to collect some info from system to simulate a Stream incoming log.
 
 ```bash
 $ docker exec –it filebeat /bin/bash
 $>./filebeat –E "filebeat.config.modules.path=./modules.d/*.yml" modules enable system
-module system enabled
+Enabled system module
 $>./filebeat setup --pipelines --modules system
-Pipelines established
+Loaded Ingest pipelines
 $>./filebeat setup –e
+....
 $> 
 ```
 
@@ -188,7 +198,7 @@ output.kafka:
 
 ### Step 2: Set up Logstash as a Kafka consumer (Kafka <= Logstash)
 
-To do this, a new configuration file must be established for this consumer:
+To do this, a new configuration file must be established for this consumer^(for convenience purpose, the file is already created in the logstash directory of this repository):
 ``àscii
 input {
   kafka {
@@ -212,7 +222,7 @@ output {
 ```bash
 $ curl "localhost:9200/_cat/indices?v=true"
 an index with name devopslab-YYYY.MM.DD must be shown in the list of indexes
-$ curl -X GET "localhost:9200/<name-of-the-devopslab-index>/_search" (please substitute index name as appropiate)
+$ curl -X GET "localhost:9200/<name-of-the-devopslab-index>/_search?pretty" (please substitute index name as appropiate)
 the documents
 $
 ```
