@@ -1,0 +1,45 @@
+###########################################################
+# Define inputs to Filebeat
+# Multiple inputs are allowed
+# This section is not required if modules are defined
+###########################################################
+#filebeat.inputs:
+#- type: log
+#  enabled: true
+#  paths:
+#    - /usr/share/filebeat/logs/*.log
+
+###########################################################
+# Define standard predefined sources
+###########################################################
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+
+filebeat.modules:
+- module: system
+  syslog:
+    enabled: true
+    var.paths: ["/var/log/syslog"]
+  auth:
+    enabled: true
+    var.paths: ["/var/log/auth.log"]
+
+###########################################################
+# Define output of the Filebeat.
+# ONLY ONE OUTPUT PER FILEBEAT INSTANCE IS ALLOWED
+###########################################################
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+#output.console:
+#  pretty: true
+#output.kafka:
+#  hosts: ["broker:19092"]
+#  topic: "devopslab"
+#  codec.json: 
+#    pretty: false
+
+###########################################################
+# Define kibana for auto dashboard setup import (optional)
+###########################################################
+setup.kibana:
+  host: "kib:5601"

@@ -1,0 +1,8 @@
+# ======================== Elasticsearch Configuration =========================
+#
+# Set up the configuration of a ElasticSearch Node via this file. 
+# Please, read the official documentation for full information about the configutation options.
+# https://www.elastic.co/guide/en/elasticsearch/reference/index.html
+cluster.name: devopslab_cluster
+node.name: prod_devopslab_node_1
+network.host: 0.0.0.0

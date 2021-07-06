@@ -5,61 +5,63 @@ services:
   # ZOOKEEPER - KAKFA CONTROL                                                      #
   ##################################################################################
   zookeeper:
-    image: confluentinc/cp-zookeeper:6.1.0
+    image: zookeeper:3.4.9
+    # image: confluentinc/cp-zookeeper:6.1.0
     # image: wurstmesiter/zookeeper
     hostname: zookeeper
     container_name: zookeeper
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_PORT: 2181
+      ZOO_SERVERS: server.1=zookeeper:2888:3888
+      #ZOOKEEPER_CLIENT_PORT: 2181
+      #ZOOKEEPER_TICK_TIME: 2000
     networks:
       - backend
     ports:
       - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - /tmp/zookeeper/data:/data
+      - /tmp/zookeeper/datalog:/datalog
 
   ##################################################################################
   # KAFKA MAIN BROKER PROCESSOR                                                    #
   ##################################################################################
   kafka_broker:
-    image: confluentinc/cp-server:6.1.0
+    image: confluentinc/cp-kafka:5.5.1
+    # image: confluentinc/cp-server:6.1.0
     # image: wurstmesiter/kafka
-    container_name: kafka_broker
+    hostname: broker
+    container_name: broker
     depends_on:
       - zookeeper
     environment:
-      discovery.type: single-node
+      # discovery.type: single-node
       KAFKA_BROKER_ID: 1
       KAFKA_ADVERTISED_HOST_NAME: 'localhost'
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://broker:19092, LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
+      #KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka_broker:19092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT, LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAKFA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_OFFSET_TOPICS_REPLICATION_FACTOR: 1
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka_broker:29092,PLAINTEXT_HOST://localhost:9092
-#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-#      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
-#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-#      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-#      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
-#      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
-#      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-#      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-#      KAFKA_JMX_PORT: 9101
-#      KAFKA_JMX_HOSTNAME: localhost
-#      KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: http://schema-registry:8081
-#      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:29092
-#      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
-#      CONFLUENT_METRICS_ENABLE: 'true'
-#      CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
-      ES_JAVA_OPTS: "-Xmx6g -Xms6g 
-                     -XX:MetaspaceSize=96m -XX:+UseG1GC 
-                     -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M 
-                     -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80 -XX:+ExplicitGCInvokesConcurrent"
+      KAKFA_LOG4J_LOGGERS: "kafka.controler=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      #ES_JAVA_OPTS: "-Xmx2g -Xms2g 
+      #               -XX:MetaspaceSize=96m -XX:+UseG1GC 
+      #               -XX:MaxGCPauseMillis=20 -XX:InitiatingHeapOccupancyPercent=35 -XX:G1HeapRegionSize=16M 
+      #               -XX:MinMetaspaceFreeRatio=50 -XX:MaxMetaspaceFreeRatio=80 -XX:+ExplicitGCInvokesConcurrent"
     networks:
       - backend
     ports:
       - "9092:9092"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/kafka/data:/var/lib/kafka/data
+      - ./tests: /usr/bin/tests
 
 ##################################################################################
+
+
 # NETWORKS                                                                       #
 ##################################################################################
 networks:
