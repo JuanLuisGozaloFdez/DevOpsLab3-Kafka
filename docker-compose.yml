@@ -27,7 +27,7 @@ services:
   ##################################################################################
   # KAFKA MAIN BROKER PROCESSOR                                                    #
   ##################################################################################
-  kafka_broker:
+  kafka:
     image: confluentinc/cp-kafka:5.5.1
     # image: confluentinc/cp-server:6.1.0
     # image: wurstmesiter/kafka
@@ -38,12 +38,10 @@ services:
     environment:
       # discovery.type: single-node
       KAFKA_BROKER_ID: 1
-      KAFKA_ADVERTISED_HOST_NAME: 'localhost'
       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://broker:19092, LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
-      #KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka_broker:19092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT, LISTENER_DOCKER_EXTERNAL:PLAINTEXT
       KAKFA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_OFFSET_TOPICS_REPLICATION_FACTOR: 1
       KAKFA_LOG4J_LOGGERS: "kafka.controler=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
       #ES_JAVA_OPTS: "-Xmx2g -Xms2g 
@@ -57,7 +55,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/kafka/data:/var/lib/kafka/data
-      - ./tests: /usr/bin/tests
+      - ./tests:/usr/bin/tests
 
 ##################################################################################
 
