@@ -158,7 +158,7 @@ $> /bin/kafka-console-consumer --bootstrap-server localhost:9092 --from-beginnin
 >
 ```
 
-Now, if everything is setup properly, all text that is typed in the Producer Terminal will appear in the Consumer Terminal and, if you have used the loop, all numbers will appear in the screen. 
+Now, if everything is setup properly, all text that is typed in the Producer Terminal will appear in the Consumer Terminal and, if you have used the loop, all numbers will appear in the screen.
 If nothing is received, then the process will be finished with a message saying "Error processing message, terminating consumer process"
 
 Enjoy it!
@@ -183,11 +183,13 @@ First thing is to make Filebeat to collect some info from system to simulate a S
 
 ```bash
 $ docker exec –it filebeat /bin/bash
-$>./filebeat –E "filebeat.config.modules.path=./modules.d/*.yml" modules enable system
+$> chown root filebeat.yml
+$> chmod go-w filebeat.yml
+$> ./filebeat –E "filebeat.config.modules.path=./modules.d/*.yml" modules enable system
 Enabled system module
-$>./filebeat setup --pipelines --modules system
+$> ./filebeat setup --pipelines --modules system
 Loaded Ingest pipelines
-$>./filebeat setup –e
+$> ./filebeat setup –e
 ....
 $> 
 ```
