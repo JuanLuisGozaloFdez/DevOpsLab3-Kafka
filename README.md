@@ -107,12 +107,12 @@ $
 Then, you can launch each application using the below links in your local web browser:
 
 * Kafka: [`http://localhost:9092`](http://localhost:9092)
-* For the ELK stack, please see how to verify in [https://github.com/JuanLuisGozaloFdez/DevOpsLab/blob/main/elk/README.md](https://github.com/JuanLuisGozaloFdez/DevOpsLab/blob/main/elk/README.md)
+* For the ELK stack, please see how to verify in [https://github.com/JuanLuisGozaloFdez/DevOpsLab2-ELK](https://github.com/JuanLuisGozaloFdez/DevOpsLab2-ELK)
 
-Stop and remove the containers
+Stop and remove the containers and volumes
 
 ```bash
-$ docker-compose down
+$ docker-compose down -v
 $
 ```
 
@@ -165,7 +165,17 @@ Enjoy it!
 
 ## Second part of the Lab: Test Kafka with ELK stack
 
-To verify Kafka in between Filebeat and Logstash in the ELK stack, you must make a few changes in the configuration files as it is shown in the following steps:
+To verify Kafka in between Filebeat and Logstash in the ELK stack, we will use a specific docker-compose file to launch the containers and then you must make a few changes in the configuration files as it is shown in the following steps:
+
+### Pre-step: Launching the new docker-compose set
+
+Use this command:
+
+```bash
+$ docker-compose -f docker-compose-elk.yml up -d
+... done
+$
+```
 
 ### Pre-step: Set up Filebeat to get info from system (System => Filebeat)
 
