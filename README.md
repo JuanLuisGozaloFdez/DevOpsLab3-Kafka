@@ -129,7 +129,7 @@ To open the terminals, you need to enter inside the container (using *'docker ps
 Now, in the Producer Terminal, a **TOPIC** (let's named *test_topic*) must be created linked to the Zookeeper process
 
 ```bash
-$> kafka-topics --create --zookeeper zookeeper:2181 --partitions 1 --replication-factor 1 --topic testtopic
+$> kafka-topics --create --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1 --topic testtopic
 Created topic testtopic
 $>
 ```
@@ -165,14 +165,14 @@ Enjoy it!
 
 ## Second part of the Lab: Test Kafka with ELK stack
 
-To verify Kafka in between Filebeat and Logstash in the ELK stack, we will use a specific docker-compose file to launch the containers and then you must make a few changes in the configuration files as it is shown in the following steps:
+To verify Kafka it is required to start the Lab with the full docker-compose.yml file to launch the containers and then you must make a few changes in the configuration files as it is shown in the following steps:
 
 ### Pre-step: Launching the new docker-compose set
 
 Use this command:
 
 ```bash
-$ docker-compose -f docker-compose-elk.yml up -d
+$ docker-compose up -d
 ... done
 $
 ```
