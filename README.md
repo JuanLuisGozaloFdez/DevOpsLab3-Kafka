@@ -9,8 +9,21 @@ Project structure:
 
 ```ascii
 .
-└── docker-compose.yaml
+└── docker-compose.yaml  (kafka + Stack ELK)
+└── docker-compose_only_kafka.yaml
 └── README.md
+```
+
+[_docker-compose-only-kafka.yml_](docker-compose-only-kafka.yml)
+
+```yml
+services:
+  zookeeper:
+    image: zookeeper:latest
+    ...
+  kafka:
+    image: bitnami/kafka:latest
+    ...
 ```
 
 [_docker-compose.yml_](docker-compose.yml)
@@ -18,55 +31,43 @@ Project structure:
 ```yml
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: zookeeper:latest
     ...
   kafka:
-    image: confluentinc/cp-kafka:latest
-    ...
-```
-
-[_docker-compose-elk.yml_](docker-compose-elk.yml)
-
-```yml
-services:
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    ...
-  kafka:
-    image: confluentinc/cp-kafka:latest
+    image: bitnami/kafka:latest
     ...
   elasticsearch:
-    image: elasticsearch:7.8.0
+    image: elasticsearch:7.17.1
     ...
   logstash:
-    image: logstash:7.10.1
+    image: logstash:7.17.1
     ...
   kibana:
-    image: kibana:7.8.0
+    image: kibana:7.17.1
     ...
   filebeat:
-    image: elastic/filebeat:7.10.2
+    image: elastic/filebeat:7.17.1
     ...
 ```
 
-Alternatively, you could use the images in bitnami/kakfa or in wurstmeister/zookeeper
+Alternatively, you could use the images in confluentic/cp-kakfa or in wurstmeister/zookeeper
 
 ## Deploy with docker-compose
 
 When using only the kafka installation
 
 ```bash
-$ docker-compose up -d
+$ docker-compose -f docker-compose-only-kafka.yml up -d
 Creating network "kafka" with driver "bridge"
 Creating zookeeper ... done
 Creating kafka ... done
 $
 ```
 
-or when using with elk integration
+or when using with the full Stack ELK integration
 
 ```bash
-$ docker-compose -f docker-compose-elk.yml up -d
+$ docker-compose up -d
 Creating network "kafka" with driver "bridge"
 Creating zookeeper ... done
 Creating kafka ... done
@@ -84,23 +85,22 @@ If everything is OK, you must see two containers running and the port mapping as
 ```bash
 $ docker ps
 CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS                    PORTS                                                                                            NAMES
-345a3e0f0b5b        zookeeper:6.0.1      "/usr/local/bin/dumb…"   11 seconds ago      Up 2 seconds             0.0.0.0:2181->2181/tcp                                                                           zoo
-fd3f0b35b448        kafka:6.0.1          "/usr/local/bin/dumb…"   11 seconds ago      Up 2 seconds             0.0.0.0:9092->9092/tcp                                                                           broker
+345a3e0f0b5b        zookeeper:latest      "/usr/local/bin/dumb…"   11 seconds ago      Up 2 seconds             0.0.0.0:2181->2181/tcp                                                                           zoo
+fd3f0b35b448        kafka:latest          "/usr/local/bin/dumb…"   11 seconds ago      Up 2 seconds             0.0.0.0:9092->9092/tcp                                                                           broker
 $
 ```
 
-or if with elk integration, four aditional containers will be shown
+or if with full Stack ELK integration, four aditional containers will be shown
 
 ```bash
 $ docker ps
 CONTAINER ID  IMAGE                 COMMAND                 CREATED         STATUS                 PORTS                                                NAMES
-345a3e0f0b5b  zookeeper:6.0.1       "/usr/local/bin/dumb…"  11 seconds ago  Up 2 seconds           0.0.0.0:2181->2181/tcp                               zoo
-fd3f0b35b448  kafka:6.0.1           "/usr/local/bin/dumb…"  11 seconds ago  Up 2 seconds           0.0.0.0:9092->9092/tcp                               broker
-45e9b302d0f0  elasticsearch:7.8.0   "/tini -- /usr/local…"  12 seconds ago  Up 2 seconds (healthy) 0.0.0.0:47321->9200/tcp, 0.0.0.0:49156->9300/tcp     els
-164f0553ed54  logstash:7.8.0        "/usr/local/bin/dock…"  13 seconds ago  Up 1 seconds           0.0.0.0:5000->5000/tcp, 0.0.0.0:5044->5044/tcp, 0.0.0.0:9600->9600/tcp, 0.0.0.0:5000->5000/udp   logstash
-fd3f0b35b448  kibana:7.8.0          "/usr/local/bin/dumb…"  14 seconds ago  Up 2 seconds           0.0.0.0:5601->5601/tcp                               kibana
-e2f3bacd4f46  filebeat:latest        "/usr/local/bin/dock…" 12 seconds ago  Up 1 seconds           0.0.0.0:                                             filebeat
-a4f767a4b3c2  nginx:latest          "/docker-entypoint…"    12 seconds ago  Up 1 seconds           0.0.0.0:4000->4000/tcp                               nginx
+345a3e0f0b5b  zookeeper:latest       "/usr/local/bin/dumb…"  11 seconds ago  Up 2 seconds           0.0.0.0:2181->2181/tcp                               zoo
+fd3f0b35b448  kafka:latest           "/usr/local/bin/dumb…"  11 seconds ago  Up 2 seconds           0.0.0.0:9092->9092/tcp                               broker
+45e9b302d0f0  elasticsearch:7.17.1   "/tini -- /usr/local…"  12 seconds ago  Up 2 seconds (healthy) 0.0.0.0:47321->9200/tcp, 0.0.0.0:49156->9300/tcp     els
+164f0553ed54  logstash:7.17.1        "/usr/local/bin/dock…"  13 seconds ago  Up 1 seconds           0.0.0.0:5000->5000/tcp, 0.0.0.0:5044->5044/tcp, 0.0.0.0:9600->9600/tcp, 0.0.0.0:5000->5000/udp   logstash
+fd3f0b35b448  kibana:7.17.1          "/usr/local/bin/dumb…"  14 seconds ago  Up 2 seconds           0.0.0.0:5601->5601/tcp                               kibana
+e2f3bacd4f46  filebeat:7.17.1        "/usr/local/bin/dock…" 12 seconds ago  Up 1 seconds           0.0.0.0:                                             filebeat
 $ 
 ```
 
@@ -202,7 +202,7 @@ The current filebeat.yml file must be modified to comment the elasticsearc outpu
 # output.elasticsearch:
 #hosts: ["localhost:9200"]
 output.kafka:
-  hosts: ["brokera:9092"]
+  hosts: ["broker:9092"]
   topic: "devopslab"
   codec.json:
     pretty: false"
@@ -210,8 +210,10 @@ output.kafka:
 
 ### Step 2: Set up Logstash as a Kafka consumer (Kafka <= Logstash)
 
-To do this, a new configuration file must be established for this consumer^(for convenience purpose, the file is already created in the logstash directory of this repository):
-``àscii
+To do this, a new configuration file must be established for this consumer
+
+(for convenience purpose, the file is already created in the logstash directory of this repository):
+```ascii
 input {
   kafka {
     bootstrap_servers => 'localhost:9092'
@@ -228,6 +230,7 @@ output {
     }
   stdout { codec => rubydebug}
 }
+```
 
 ### Step 3: Verify in ElasticSearch (as Logstash is already set to send data to Elastic) (Logstash => Elastic)
 
