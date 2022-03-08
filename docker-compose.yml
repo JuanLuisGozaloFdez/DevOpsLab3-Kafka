@@ -13,9 +13,10 @@ services:
     ports:
       - "2181:2181"
     environment:
-      ZOO_MY_ID: 1
-      ZOO_PORT: 2181
-      ZOO_SERVERS: server.1=zookeeper:2888:3888
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      #- ZOO_MY_ID=1
+      #- ZOO_PORT=2181
+      #- ZOO_SERVERS: server.1=zookeeper:2888:3888
     volumes:
       - /tmp/zookeeper/data:/data
       - /tmp/zookeeper/datalog:/datalog
@@ -32,14 +33,16 @@ services:
     ports:
       - "9092:9092"
     environment:
-      - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_BROKER_ID=1
-      - KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://broker:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
-      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
-      - KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
-      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+      # - KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://broker:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
+      # - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      # - KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      #- KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      # - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
     volumes:
       - /tmp/kafka/data:/var/lib/kafka/data
       - ./tests:/usr/bin/tests
