@@ -5,9 +5,11 @@ services:
   # ZOOKEEPER - KAKFA CONTROL                                                      #
   ##################################################################################
   zookeeper:
-    image: zookeeper:3.4.9
+    image: zookeeper:latest
     hostname: zookeeper
     container_name: zookeeper
+    networks:
+      - elastic
     ports:
       - "2181:2181"
     environment:
@@ -22,9 +24,11 @@ services:
   # KAFKA MAIN BROKER PROCESSOR                                                    #
   ##################################################################################
   kafka:
-    image: confluentinc/cp-kafka:5.5.1
+    image: bitnami/kafka:latest
     hostname: broker
     container_name: broker
+    networks:
+      - elastic
     ports:
       - "9092:9092"
     environment:
@@ -45,13 +49,15 @@ services:
   # ELASTICSEARCH NODE                                                             #
   ##################################################################################
   elasticsearch:
-    image: elasticsearch:7.8.0
+    image: elasticsearch:7.17.1
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
     volumes:
       - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    networks:
+      - elastic
     ports:
       - "9200:9200" # to be used by direct http connections
       - "9300:9300" # to be used by application client connections
@@ -65,7 +71,7 @@ services:
   # LOGSTASH NODE                                                                  #
   ##################################################################################
   logstash:
-    image: logstash:7.10.1
+    image: logstash:7.17.1
     container_name: logstash
     depends_on:
       - elasticsearch
@@ -74,6 +80,9 @@ services:
       LS_JAVA_OPTS: "-Xms512m -Xmx512m"
     volumes:
       - ./logstash/conf:/usr/share/logstash/pipeline
+      #- ./logstash/templates:/usr/share/logstash/templates
+    networks:
+      - elastic
     ports:
       - "5000:5000/tcp"
       - "5000:5000/udp"
@@ -84,8 +93,10 @@ services:
   # KIBANA NODE TO VISUALIZE DATA                                                  #
   ##################################################################################
   kibana:
-    image: kibana:7.8.0
-    container_name: kib
+    image: kibana:7.17.1
+    container_name: kibana
+    networks:
+      - elastic
     ports:
       - "5601:5601"
   
@@ -93,8 +104,15 @@ services:
   # FILEBEAT NODE                                                                  #
   ##################################################################################
   filebeat:
-    image: docker.elastic.co/beats/filebeat:7.11.1
+    image: elastic/filebeat:7.17.1
     container_name: filebeat
+    depends_on:
+      - logstash
+      - elasticsearch
+      - kibana
+    user: root
+    networks:
+      - elastic
     volumes:
       - ./filebeat/logs:/usr/share/filebeat/logs
       - ./filebeat/conf/filebeat.yml:/usr/share/filebeat/filebeat.yml
@@ -102,7 +120,8 @@ services:
       - /var/log/syslog:/var/log/syslog:ro
       - /var/log/auth.log:/var/log/auth.log:ro
     command: ["--strict.perms=false"]
-    user: root
+        # - "–-strict.perms=false"
+        # - "–-E filebeat.config.modules.path=./modules.d/*.yml"
     stdin_open: true # docker run -i
     tty: true        # docker run -t   
     logging:
@@ -115,3 +134,6 @@ services:
 # NETWORKS                                                                       #
 ##################################################################################
 # Default network will be started
+networks:
+  elastic:
+    driver: bridge
