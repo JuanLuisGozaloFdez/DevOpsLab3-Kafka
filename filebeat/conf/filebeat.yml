@@ -42,4 +42,4 @@ output.elasticsearch:
 # Define kibana for auto dashboard setup import (optional)
 ###########################################################
 setup.kibana:
-  host: "kib:5601"
+  host: "kibana:5601"
