@@ -20,6 +20,7 @@ services:
     volumes:
       - /tmp/zookeeper/data:/data
       - /tmp/zookeeper/datalog:/datalog
+      - ./zookeeper/conf/zoo.cfg:/conf/zoo.cfg
       
   ##################################################################################
   # KAFKA MAIN BROKER PROCESSOR                                                    #
